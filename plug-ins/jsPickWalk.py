@@ -2,6 +2,7 @@ import maya.cmds as cmds
 import maya.mel as mel
 import pymel.core as pm
 import maya.OpenMaya as OpenMaya
+import maya.OpenMayaMPx as OpenMayaMPx
 
 main_buttons = {}
 CREATE_MODE_NAME = "create"
@@ -16,9 +17,45 @@ DOWN_BUTTON = "js_downButton"
 CENTRE_BUTTON = "js_centreButton"
 BUTTON_NAMES = [LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, CENTRE_BUTTON]
 
+INIT_CMD = ""
+UP_CMD = "jsPickWalkUp"
+DOWN_CMD = "jsPickWalkDown"
+LEFT_CMD = "jsPickWalkLeft"
+RIGHT_CMD = "jsPickWalkRight"
+CMD_NAMES = [["Up", UP_CMD, INIT_CMD], ["Down", DOWN_CMD, INIT_CMD], ["Left", LEFT_CMD, INIT_CMD], ["Right", RIGHT_CMD, INIT_CMD]]
+
+
 OnExitCallback = None
 
 js_pick_walk_mode = CREATE_MODE_NAME
+
+class PickWalkUpCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("up")
+
+class PickWalkDownCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("down")
+
+class PickWalkLeftCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("left")
+
+class PickWalkRightCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("right")
 
 def check_valid_dir(direction):
 	if direction not in ["up", "down", "left", "right"]:
@@ -68,8 +105,8 @@ def js_pick_walk(direction):
 		connection = find_connected_object(obj, direction)
 		if connection:
 			newSelectedObjs.append(connection)
-	pm.select(newSelectedObjs)
-	return newSelectedObjs
+	if newSelectedObjs:
+		pm.select(newSelectedObjs)
 
 
 
@@ -125,9 +162,8 @@ def make_pick_walk_button_click(name):
 							break_pick_walk(centre_obj_name, connections[0], direction)
 
 		elif js_pick_walk_mode == NAV_MODE_NAME:
-			new_selection = js_pick_walk(direction)
-			if new_selection:
-				add_selected_obj_to_middle()
+			js_pick_walk(direction)
+			add_selected_obj_to_middle()
 
 	update_pick_walk_window()
 
@@ -260,6 +296,9 @@ def make_pick_walk_ui():
 	print main_buttons
 	add_selected_obj_to_middle()
 
+def cmd_creator():
+	return OpenMayaMPx.asMPxPtr( PickWalkCommand() )
+
 def teardown_shelf(*args):
 	try:
 		mel.eval('if (`shelfLayout -exists {0} `) deleteShelfTabNoPrompt {0};'.format(SHELF_NAME))
@@ -272,22 +311,43 @@ def setup_shelf():
 	cmds.shelfButton(command=make_pick_walk_ui, image="jsIcon.png", label="Activate UI", annotation="Activate UI", parent=shelfTab)
 
 
-def setup_js_pick_walk():
-	pm.nameCommand("jsPickWalkUp", ann="Pick Walk Up", command= lambda *args: js_pick_walk("up"))
-	pm.nameCommand("jsPickWalkDown", ann="Pick Walk Down", command= lambda *args: js_pick_walk("down"))
-	pm.nameCommand("jsPickWalkLeft", ann="Pick Walk Left", command= lambda *args: js_pick_walk("left"))
-	pm.nameCommand("jsPickWalkRight", ann="Pick Walk Right", command= lambda *args: js_pick_walk("right"))
+def setup_hotkeys():
+	for key, cmd_name, init_cmd in CMD_NAMES:
+		init_cmd = pm.hotkey(key, query=True, ctrlModifier=True, name=True)
+		pm.nameCommand(cmd_name, ann=cmd_name, command = cmd_name)
+		pm.hotkey(keyShortcut = key, ctrlModifier=True, name=cmd_name)
 
-	pm.hotkey(keyShortcut="Up", ctrlModifier=True, name="jsPickWalkUp")
-	pm.hotkey(keyShortcut="Down", ctrlModifier=True, name="jsPickWalkDown")
-	pm.hotkey(keyShortcut="Left", ctrlModifier=True, name="jsPickWalkLeft")
-	pm.hotkey(keyShortcut="Right", ctrlModifier=True, name="jsPickWalkRight")
+def revert_hotkeys():
+	for key, cmd_name, init_cmd in CMD_NAMES:
+		pm.hotkey(keyShortcut = key, ctrlModifier=True, name=init_cmd)
+
+def deregister_cmds(mobject):
+	plugin = OpenMayaMPx.MFnPlugin(mobject)
+	for _, cmd_name, _ in CMD_NAMES:
+		try:
+			plugin.deregisterCommand(cmd_name)
+		except:
+			print "Failed to deregister command " + cmd_name
+
+def register_cmds(mobject):
+	deregister_cmds(mobject)
+	plugin = OpenMayaMPx.MFnPlugin(mobject)
+	try:
+		plugin.registerCommand(UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ))
+		plugin.registerCommand(DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ))
+		plugin.registerCommand(LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ))
+		plugin.registerCommand(RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ))
+	except:
+		print "Failed to register command " + cmd_name
+		raise
 
 # Initialize the script plug-in
 def initializePlugin(mobject):
 	setup_shelf()
 	global OnExitCallback
 	OnExitCallback = OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kMayaExiting, teardown_shelf)
+	register_cmds(mobject)
+	setup_hotkeys()
 
 
 # Uninitialize the script plug-in
@@ -297,3 +357,5 @@ def uninitializePlugin(mobject):
     global OnExitCallback
     OpenMaya.MSceneMessage.removeCallback(OnExitCallback)
     OnExitCallback = None
+    deregister_cmds(mobject)
+    revert_hotkeys()
