@@ -14,7 +14,10 @@ Before you can pickwalk you need to mark up your scene with attributes that enco
 spatial relationships between the nodes.
 
 ###Navigation
-To navigate use CTRL + arrow keys
+To navigate use UP and DOWN. CTRL + UP/DOWN will add the node to the selected set.
+
+There are no out-of-the-box keybindings for LEFT and RIGHT, but you can bind whatever keys you want
+to the "jsPickWalkLeft", "jsPickWalkRight", "jsPickWalkAddLeft", "jsPickWalkAddRight"
 
 ###Creating Relationships
 Go to the JsPickWalk shelf and click the button to open the UI.

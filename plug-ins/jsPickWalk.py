@@ -8,107 +8,107 @@ import maya.OpenMayaMPx as OpenMayaMPx
 main_buttons = {}
 CREATE_MODE_NAME = "create"
 NAV_MODE_NAME = "navigate"
-SHELF_NAME = "JSPickWalk"
-UI_WINDOW_NAME = "JSPickWalkWindow"
+SHELF_NAME = "RadPickWalk"
+UI_WINDOW_NAME = "RadPickWalkWindow"
 
-LEFT_BUTTON = "js_leftButton"
-RIGHT_BUTTON = "js_rightButton"
-UP_BUTTON = "js_upButton"
-DOWN_BUTTON = "js_downButton"
-CENTRE_BUTTON = "js_centreButton"
+LEFT_BUTTON = "rad_leftButton"
+RIGHT_BUTTON = "rad_rightButton"
+UP_BUTTON = "rad_upButton"
+DOWN_BUTTON = "rad_downButton"
+CENTRE_BUTTON = "rad_centreButton"
 BUTTON_NAMES = [LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, CENTRE_BUTTON]
 
 INIT_CMD = ""
-UP_CMD = "jsPickWalkUp"
-DOWN_CMD = "jsPickWalkDown"
-LEFT_CMD = "jsPickWalkLeft"
-RIGHT_CMD = "jsPickWalkRight"
-UP_ADD_CMD = "jsPickWalkAddUp"
-DOWN_ADD_CMD = "jsPickWalkAddDown"
-LEFT_ADD_CMD = "jsPickWalkAddLeft"
-RIGHT_ADD_CMD = "jsPickWalkAddRight"
+UP_CMD = "radPickWalkUp"
+DOWN_CMD = "radPickWalkDown"
+LEFT_CMD = "radPickWalkLeft"
+RIGHT_CMD = "radPickWalkRight"
+UP_ADD_CMD = "radPickWalkAddUp"
+DOWN_ADD_CMD = "radPickWalkAddDown"
+LEFT_ADD_CMD = "radPickWalkAddLeft"
+RIGHT_ADD_CMD = "radPickWalkAddRight"
 
 NULL_KEY_BINDING = "None"
 
 command_info = collections.namedtuple('command_info', ['key_binding', 'name', 'cmd_creator', 'ctrl', 'alt'])
-# CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ), False, False),
-#         command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ), False, False),
-#         command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ), True, False),
-#         command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ), True, False),
-#         command_info("Left", LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ), True, False),
-#         command_info("Right", RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ), True, False),
-#         command_info("Left", LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ), True, True),
-#         command_info("Right", RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ), True, True)]
+# CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkUpCommand() ), False, False),
+#         command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkDownCommand() ), False, False),
+#         command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddUpCommand() ), True, False),
+#         command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddDownCommand() ), True, False),
+#         command_info("Left", LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkLeftCommand() ), True, False),
+#         command_info("Right", RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkRightCommand() ), True, False),
+#         command_info("Left", LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddLeftCommand() ), True, True),
+#         command_info("Right", RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddRightCommand() ), True, True)]
 
-CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ), False, False),
-        command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ), False, False),
-        command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ), True, False),
-        command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ), True, False),
-        command_info(NULL_KEY_BINDING, LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ), True, False),
-        command_info(NULL_KEY_BINDING, RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ), True, False),
-        command_info(NULL_KEY_BINDING, LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ), True, True),
-        command_info(NULL_KEY_BINDING, RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ), True, True)]
+CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkUpCommand() ), False, False),
+        command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkDownCommand() ), False, False),
+        command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddUpCommand() ), True, False),
+        command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddDownCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkLeftCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkRightCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddLeftCommand() ), True, True),
+        command_info(NULL_KEY_BINDING, RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( RadPickWalkAddRightCommand() ), True, True)]
 
 
 OnExitCallback = None
 
-js_pick_walk_mode = CREATE_MODE_NAME
+rad_pick_walk_mode = CREATE_MODE_NAME
 
-class PickWalkUpCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkUpCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("up", False)
+		rad_pick_walk("up", False)
 
-class PickWalkDownCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkDownCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("down", False)
+		rad_pick_walk("down", False)
 
-class PickWalkLeftCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkLeftCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("left", False)
+		rad_pick_walk("left", False)
 
-class PickWalkRightCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkRightCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("right", False)
+		rad_pick_walk("right", False)
 
-class PickWalkAddUpCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkAddUpCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("up", True)
+		rad_pick_walk("up", True)
 
-class PickWalkAddDownCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkAddDownCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("down", True)
+		rad_pick_walk("down", True)
 
-class PickWalkAddLeftCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkAddLeftCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("left", True)
+		rad_pick_walk("left", True)
 
-class PickWalkAddRightCommand(OpenMayaMPx.MPxCommand):
+class RadPickWalkAddRightCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("right", True)
+		rad_pick_walk("right", True)
 
 def check_valid_dir(direction):
 	if direction not in ["up", "down", "left", "right"]:
@@ -119,7 +119,7 @@ def check_valid_obj(obj):
 		raise NameError("Invalid object: " + obj)
 
 def dir_to_attr(direction):
-	return "js_" + direction
+	return "rad_" + direction
 
 def mark_scene_dirty():
 	mel.eval("file -modified 1")
@@ -149,7 +149,7 @@ def find_connected_object(source, direction):
 			return connections[0]
 	return ""
 
-def js_pick_walk(direction, add):
+def rad_pick_walk(direction, add):
 	check_valid_dir(direction)
 
 	selectedObjs = pm.ls(selection=True)
@@ -177,12 +177,12 @@ def js_pick_walk(direction, add):
 		pm.select(newSelectedObjs, replace=True)
 
 def set_pick_walk_create():
-	global js_pick_walk_mode
-	js_pick_walk_mode = CREATE_MODE_NAME
+	global rad_pick_walk_mode
+	rad_pick_walk_mode = CREATE_MODE_NAME
 
 def set_pick_walk_navigate():
-	global js_pick_walk_mode
-	js_pick_walk_mode = NAV_MODE_NAME
+	global rad_pick_walk_mode
+	rad_pick_walk_mode = NAV_MODE_NAME
 
 def make_pick_walk_button_click(name):
 	button = main_buttons[name]
@@ -205,9 +205,9 @@ def make_pick_walk_button_click(name):
 	centre_obj = main_buttons[CENTRE_BUTTON]
 	centre_obj_name = centre_obj.getLabel()
 	print centre_obj_name
-	print js_pick_walk_mode
+	print rad_pick_walk_mode
 	if pm.objExists(centre_obj_name):
-		if js_pick_walk_mode == CREATE_MODE_NAME:
+		if rad_pick_walk_mode == CREATE_MODE_NAME:
 			selection = pm.ls(selection=True)
 			if selection:
 				if not pm.attributeQuery(attr_name, node=centre_obj_name, exists=True):
@@ -227,8 +227,8 @@ def make_pick_walk_button_click(name):
 						if connections:
 							break_pick_walk(centre_obj_name, connections[0], direction)
 
-		elif js_pick_walk_mode == NAV_MODE_NAME:
-			js_pick_walk(direction, False)
+		elif rad_pick_walk_mode == NAV_MODE_NAME:
+			rad_pick_walk(direction, False)
 			add_selected_obj_to_middle()
 
 	update_pick_walk_window()
@@ -238,17 +238,17 @@ def build_make_pick_walk_window(window_name):
 	pm.window(window_name, title="Make Pick Walk")
 	pm.columnLayout(adjustableColumn=True)
 	form_layout = pm.formLayout(numberOfDivisions=100)
-	topLeftBlank = pm.text("js_topLeftBlank", label="")
+	topLeftBlank = pm.text("rad_topLeftBlank", label="")
 	upButton = pm.button(UP_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(UP_BUTTON))
-	topRightBlank = pm.text("js_topRightBlank", label="")
+	topRightBlank = pm.text("rad_topRightBlank", label="")
 
 	leftButton = pm.button(LEFT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(LEFT_BUTTON))
 	centreButton = pm.button(CENTRE_BUTTON, label="nothing selected", command= lambda *args: add_selected_obj_to_middle())
 	rightButton = pm.button(RIGHT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(RIGHT_BUTTON))
 
-	botLeftBlank = pm.text("js_botLeftBlank", label="")
+	botLeftBlank = pm.text("rad_botLeftBlank", label="")
 	downButton = pm.button(DOWN_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(DOWN_BUTTON))
-	botRightBlank = pm.text("js_botRightBlank", label="")
+	botRightBlank = pm.text("rad_botRightBlank", label="")
 
 	main_buttons[UP_BUTTON] = upButton
 	main_buttons[LEFT_BUTTON] = leftButton
@@ -361,9 +361,6 @@ def make_pick_walk_ui():
 	pm.showWindow(UI_WINDOW_NAME)
 	print main_buttons
 	add_selected_obj_to_middle()
-
-def cmd_creator():
-	return OpenMayaMPx.asMPxPtr( PickWalkCommand() )
 
 def teardown_shelf(*args):
 	try:
