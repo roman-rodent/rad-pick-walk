@@ -1,12 +1,12 @@
-#JS Pickwalk Module
+#Radiant Pickwalk Module
 
 ##Setup
 1. Clone the repository somewhere on your computer, e.g. C:/SomeStuff/Repo
-2. Edit the folder in the jsPickWalkModule.mod file to match the folder from step 1
-3. Copy the jsPickWalkModule.mod file to Maya's modules folder (likely Documents/maya/<version>/modules)
+2. Edit the folder in the radPickWalkModule.mod file to match the folder from step 1
+3. Copy the radPickWalkModule.mod file to Maya's modules folder (likely Documents/maya/<version>/modules)
     * If you don't know where the folder is run getenv(MAYA_MODULE_PATH) in the Script Editor
 4. Run Maya, and go to Window -> Settings/Preferences -> Plug-in Manager
-5. You should see jsPickWalk.py. Click on "Loaded" and "Auto-Load"
+5. You should see radPickWalk.py. Click on "Loaded" and "Auto-Load"
 
 
 ##Usage
@@ -17,10 +17,10 @@ spatial relationships between the nodes.
 To navigate use UP and DOWN. CTRL + UP/DOWN will add the node to the selected set.
 
 There are no out-of-the-box keybindings for LEFT and RIGHT, but you can bind whatever keys you want
-to the "jsPickWalkLeft", "jsPickWalkRight", "jsPickWalkAddLeft", "jsPickWalkAddRight"
+to the "radPickWalkLeft", "radPickWalkRight", "radPickWalkAddLeft", "radPickWalkAddRight" commands.
 
 ###Creating Relationships
-Go to the JsPickWalk shelf and click the button to open the UI.
+Go to the RadPickWalk shelf and click the button to open the UI.
 
 The general workflow is:
 * Select a node and click the centre button to set it as the source node
