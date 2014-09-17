@@ -22,7 +22,15 @@ UP_CMD = "jsPickWalkUp"
 DOWN_CMD = "jsPickWalkDown"
 LEFT_CMD = "jsPickWalkLeft"
 RIGHT_CMD = "jsPickWalkRight"
-CMD_NAMES = [["Up", UP_CMD, INIT_CMD], ["Down", DOWN_CMD, INIT_CMD], ["Left", LEFT_CMD, INIT_CMD], ["Right", RIGHT_CMD, INIT_CMD]]
+UP_ADD_CMD = "jsPickWalkAddUp"
+DOWN_ADD_CMD = "jsPickWalkAddDown"
+LEFT_ADD_CMD = "jsPickWalkAddLeft"
+RIGHT_ADD_CMD = "jsPickWalkAddRight"
+
+CMD_NAMES = [["Up", UP_CMD], ["Down", DOWN_CMD], ["Left", LEFT_CMD], ["Right", RIGHT_CMD]]
+OLD_CMD_NAMES = []
+ADD_CMD_NAMES = [["Up", UP_ADD_CMD], ["Down", DOWN_ADD_CMD], ["Left", LEFT_ADD_CMD], ["Right", RIGHT_ADD_CMD]]
+OLD_ADD_CMD_NAMES = []
 
 
 OnExitCallback = None
@@ -34,28 +42,56 @@ class PickWalkUpCommand(OpenMayaMPx.MPxCommand):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("up")
+		js_pick_walk("up", False)
 
 class PickWalkDownCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("down")
+		js_pick_walk("down", False)
 
 class PickWalkLeftCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("left")
+		js_pick_walk("left", False)
 
 class PickWalkRightCommand(OpenMayaMPx.MPxCommand):
 	def __init__(self):
 		OpenMayaMPx.MPxCommand.__init__(self)
 
 	def doIt(self, argList):
-		js_pick_walk("right")
+		js_pick_walk("right", False)
+
+class PickWalkAddUpCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("up", True)
+
+class PickWalkAddDownCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("down", True)
+
+class PickWalkAddLeftCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("left", True)
+
+class PickWalkAddRightCommand(OpenMayaMPx.MPxCommand):
+	def __init__(self):
+		OpenMayaMPx.MPxCommand.__init__(self)
+
+	def doIt(self, argList):
+		js_pick_walk("right", True)
 
 def check_valid_dir(direction):
 	if direction not in ["up", "down", "left", "right"]:
@@ -96,19 +132,26 @@ def find_connected_object(source, direction):
 			return connections[0]
 	return ""
 
-def js_pick_walk(direction):
+def js_pick_walk(direction, add):
 	check_valid_dir(direction)
 
 	selectedObjs = pm.ls(selection=True)
+	if not selectedObjs:
+		return
+
 	newSelectedObjs = []
 	for obj in selectedObjs:
-		connection = find_connected_object(obj, direction)
-		if connection:
-			newSelectedObjs.append(connection)
+		if add and obj not in newSelectedObjs:
+			newSelectedObjs.append(obj)
+	connection = find_connected_object(selectedObjs[len(selectedObjs) - 1], direction)
+	try:
+		newSelectedObjs.remove(connection)
+	except:
+		pass
+	if connection:
+		newSelectedObjs.append(connection)
 	if newSelectedObjs:
-		pm.select(newSelectedObjs)
-
-
+		pm.select(newSelectedObjs, replace=True)
 
 def set_pick_walk_create():
 	global js_pick_walk_mode
@@ -162,7 +205,7 @@ def make_pick_walk_button_click(name):
 							break_pick_walk(centre_obj_name, connections[0], direction)
 
 		elif js_pick_walk_mode == NAV_MODE_NAME:
-			js_pick_walk(direction)
+			js_pick_walk(direction, False)
 			add_selected_obj_to_middle()
 
 	update_pick_walk_window()
@@ -312,18 +355,41 @@ def setup_shelf():
 
 
 def setup_hotkeys():
-	for key, cmd_name, init_cmd in CMD_NAMES:
-		init_cmd = pm.hotkey(key, query=True, ctrlModifier=True, name=True)
+	for key, cmd_name in CMD_NAMES:
+		init_cmd = pm.hotkey(key, query=True, name=True)
+		OLD_CMD_NAMES.append(init_cmd)
 		pm.nameCommand(cmd_name, ann=cmd_name, command = cmd_name)
-		pm.hotkey(keyShortcut = key, ctrlModifier=True, name=cmd_name)
+		pm.hotkey(keyShortcut = key, name=cmd_name)
+
+	for key, cmd_name in ADD_CMD_NAMES:
+		init_cmd = pm.hotkey(key, query=True, ctrlModifier=True, name=True)
+		OLD_ADD_CMD_NAMES.append(init_cmd)
+		pm.nameCommand(cmd_name, ann=cmd_name, command = cmd_name)
+		pm.hotkey(keyShortcut = key, name=cmd_name, ctrlModifier=True)
+
+	print OLD_ADD_CMD_NAMES
+	print OLD_CMD_NAMES
 
 def revert_hotkeys():
-	for key, cmd_name, init_cmd in CMD_NAMES:
-		pm.hotkey(keyShortcut = key, ctrlModifier=True, name=init_cmd)
+	for i in range(0,len(CMD_NAMES)):
+		key = CMD_NAMES[i][0]
+		init_cmd = OLD_CMD_NAMES[i]
+		pm.hotkey(keyShortcut = key, name=init_cmd)
+
+	for i in range(0,len(ADD_CMD_NAMES)):
+		key = ADD_CMD_NAMES[i][0]
+		init_cmd = ADD_CMD_NAMES[i]
+		pm.hotkey(keyShortcut = key, ctrModifier=True, name=init_cmd)
 
 def deregister_cmds(mobject):
 	plugin = OpenMayaMPx.MFnPlugin(mobject)
-	for _, cmd_name, _ in CMD_NAMES:
+	for _, cmd_name in CMD_NAMES:
+		try:
+			plugin.deregisterCommand(cmd_name)
+		except:
+			print "Failed to deregister command " + cmd_name
+
+	for _, cmd_name in ADD_CMD_NAMES:
 		try:
 			plugin.deregisterCommand(cmd_name)
 		except:
@@ -337,6 +403,10 @@ def register_cmds(mobject):
 		plugin.registerCommand(DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ))
 		plugin.registerCommand(LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ))
 		plugin.registerCommand(RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ))
+		plugin.registerCommand(UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ))
+		plugin.registerCommand(DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ))
+		plugin.registerCommand(LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ))
+		plugin.registerCommand(RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ))		
 	except:
 		print "Failed to register command " + cmd_name
 		raise
