@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 import pymel.core as pm
+import collections
 import maya.OpenMaya as OpenMaya
 import maya.OpenMayaMPx as OpenMayaMPx
 
@@ -27,10 +28,26 @@ DOWN_ADD_CMD = "jsPickWalkAddDown"
 LEFT_ADD_CMD = "jsPickWalkAddLeft"
 RIGHT_ADD_CMD = "jsPickWalkAddRight"
 
-CMD_NAMES = [["Up", UP_CMD], ["Down", DOWN_CMD], ["Left", LEFT_CMD], ["Right", RIGHT_CMD]]
-OLD_CMD_NAMES = []
-ADD_CMD_NAMES = [["Up", UP_ADD_CMD], ["Down", DOWN_ADD_CMD], ["Left", LEFT_ADD_CMD], ["Right", RIGHT_ADD_CMD]]
-OLD_ADD_CMD_NAMES = []
+NULL_KEY_BINDING = "None"
+
+command_info = collections.namedtuple('command_info', ['key_binding', 'name', 'cmd_creator', 'ctrl', 'alt'])
+# CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ), False, False),
+#         command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ), False, False),
+#         command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ), True, False),
+#         command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ), True, False),
+#         command_info("Left", LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ), True, False),
+#         command_info("Right", RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ), True, False),
+#         command_info("Left", LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ), True, True),
+#         command_info("Right", RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ), True, True)]
+
+CMDS = [command_info("Up", UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ), False, False),
+        command_info("Down", DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ), False, False),
+        command_info("Up", UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ), True, False),
+        command_info("Down", DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ), True, False),
+        command_info(NULL_KEY_BINDING, LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ), True, True),
+        command_info(NULL_KEY_BINDING, RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ), True, True)]
 
 
 OnExitCallback = None
@@ -354,62 +371,31 @@ def setup_shelf():
 	cmds.shelfButton(command=make_pick_walk_ui, image="jsIcon.png", label="Activate UI", annotation="Activate UI", parent=shelfTab)
 
 
-def setup_hotkeys():
-	for key, cmd_name in CMD_NAMES:
-		init_cmd = pm.hotkey(key, query=True, name=True)
-		OLD_CMD_NAMES.append(init_cmd)
-		pm.nameCommand(cmd_name, ann=cmd_name, command = cmd_name)
-		pm.hotkey(keyShortcut = key, name=cmd_name)
-
-	for key, cmd_name in ADD_CMD_NAMES:
-		init_cmd = pm.hotkey(key, query=True, ctrlModifier=True, name=True)
-		OLD_ADD_CMD_NAMES.append(init_cmd)
-		pm.nameCommand(cmd_name, ann=cmd_name, command = cmd_name)
-		pm.hotkey(keyShortcut = key, name=cmd_name, ctrlModifier=True)
-
-	print OLD_ADD_CMD_NAMES
-	print OLD_CMD_NAMES
-
-def revert_hotkeys():
-	for i in range(0,len(CMD_NAMES)):
-		key = CMD_NAMES[i][0]
-		init_cmd = OLD_CMD_NAMES[i]
-		pm.hotkey(keyShortcut = key, name=init_cmd)
-
-	for i in range(0,len(ADD_CMD_NAMES)):
-		key = ADD_CMD_NAMES[i][0]
-		init_cmd = ADD_CMD_NAMES[i]
-		pm.hotkey(keyShortcut = key, ctrModifier=True, name=init_cmd)
-
 def deregister_cmds(mobject):
 	plugin = OpenMayaMPx.MFnPlugin(mobject)
-	for _, cmd_name in CMD_NAMES:
+	for command_info in CMDS:
 		try:
-			plugin.deregisterCommand(cmd_name)
+			# Unbind the hotkey completely
+			plugin.deregisterCommand(command_info.name)
+			if command_info.key_binding != NULL_KEY_BINDING:
+				pm.hotkey(keyShortcut = command_info.key_binding, ctrlModifier=command_info.ctrl, altModifier=command_info.alt, name="")
+			print "Deregistered command " + command_info.name
 		except:
-			print "Failed to deregister command " + cmd_name
+			print "Failed to deregister command " + command_info.name
 
-	for _, cmd_name in ADD_CMD_NAMES:
-		try:
-			plugin.deregisterCommand(cmd_name)
-		except:
-			print "Failed to deregister command " + cmd_name
 
 def register_cmds(mobject):
 	deregister_cmds(mobject)
 	plugin = OpenMayaMPx.MFnPlugin(mobject)
-	try:
-		plugin.registerCommand(UP_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkUpCommand() ))
-		plugin.registerCommand(DOWN_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkDownCommand() ))
-		plugin.registerCommand(LEFT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkLeftCommand() ))
-		plugin.registerCommand(RIGHT_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkRightCommand() ))
-		plugin.registerCommand(UP_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddUpCommand() ))
-		plugin.registerCommand(DOWN_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddDownCommand() ))
-		plugin.registerCommand(LEFT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddLeftCommand() ))
-		plugin.registerCommand(RIGHT_ADD_CMD, lambda *args: OpenMayaMPx.asMPxPtr( PickWalkAddRightCommand() ))		
-	except:
-		print "Failed to register command " + cmd_name
-		raise
+	for command_info in CMDS:
+		try:
+			plugin.registerCommand(command_info.name, command_info.cmd_creator)
+			pm.nameCommand(command_info.name, ann=command_info.name, command = command_info.name)
+			if command_info.key_binding != NULL_KEY_BINDING:
+				pm.hotkey(keyShortcut = command_info.key_binding, name=command_info.name, ctrlModifier=command_info.ctrl, altModifier=command_info.alt)
+			print "Registered command " + command_info.name
+		except:
+			print "Failed to register command " + command_info.name
 
 # Initialize the script plug-in
 def initializePlugin(mobject):
@@ -417,7 +403,6 @@ def initializePlugin(mobject):
 	global OnExitCallback
 	OnExitCallback = OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kMayaExiting, teardown_shelf)
 	register_cmds(mobject)
-	setup_hotkeys()
 
 
 # Uninitialize the script plug-in
@@ -428,4 +413,3 @@ def uninitializePlugin(mobject):
     OpenMaya.MSceneMessage.removeCallback(OnExitCallback)
     OnExitCallback = None
     deregister_cmds(mobject)
-    revert_hotkeys()
