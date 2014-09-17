@@ -1,0 +1,1 @@
++ jsPickWalkModule 1.0 C:\Users\Roman\Documents\jsPickWalkModule
