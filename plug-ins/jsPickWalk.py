@@ -161,12 +161,18 @@ def js_pick_walk(direction, add):
 		if add and obj not in newSelectedObjs:
 			newSelectedObjs.append(obj)
 	connection = find_connected_object(selectedObjs[len(selectedObjs) - 1], direction)
-	try:
-		newSelectedObjs.remove(connection)
-	except:
-		pass
 	if connection:
-		newSelectedObjs.append(connection)
+		# If going back to previous node, handle it as "unselect"
+		if len(newSelectedObjs) > 1 and newSelectedObjs[len(newSelectedObjs) - 2] == connection:
+			newSelectedObjs.pop(len(newSelectedObjs) - 1)
+		else:
+			# Connection should be at the end of the list, since that
+			# will be the selected node
+			try:
+				newSelectedObjs.remove(connection)
+			except:
+				pass
+			newSelectedObjs.append(connection)
 	if newSelectedObjs:
 		pm.select(newSelectedObjs, replace=True)
 
