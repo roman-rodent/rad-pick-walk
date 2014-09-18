@@ -68,10 +68,6 @@ global proc int deleteShelfTabNoPrompt(string $shelfName)
     // Check for the last shelf
     string $ok      = (uiRes("m_deleteShelfTab.kOK"));
     if (1 == $numShelves) {
-        confirmDialog -title (uiRes("m_deleteShelfTab.kAlert"))  
-            -button $ok 
-            -defaultButton $ok 
-            -message (uiRes("m_deleteShelfTab.kCannotDelete")) ;
         return $returnStatus;
     }
 
