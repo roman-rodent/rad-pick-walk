@@ -8,6 +8,11 @@
 4. Run Maya, and go to Window -> Settings/Preferences -> Plug-in Manager
 5. You should see radPickWalk.py. Click on "Loaded" and "Auto-Load"
 
+## Key-Binding Instead Of Shelf
+Once you load the plug-in you can bind a key to the following command:
+    from radPickWalkFunctions import make_pick_walk_ui;make_pick_walk_ui()
+
+Now you can use the key to bring up the pick-walk UI instead of clicking on the shelf :)
 
 ##Usage
 Before you can pickwalk you need to mark up your scene with attributes that encode the
