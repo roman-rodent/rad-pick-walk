@@ -4,7 +4,7 @@
 1. Clone the repository somewhere on your computer, e.g. C:/SomeStuff/Repo
 2. Edit the folder in the radPickWalkModule.mod file to match the folder from step 1
 3. Copy the radPickWalkModule.mod file to Maya's modules folder (likely Documents/maya/<version>/modules)
-    * If you don't know where the folder is run getenv(MAYA_MODULE_PATH) in the Script Editor
+    * If you don't know where the folder is run getenv("MAYA_MODULE_PATH") in the Script Editor
 4. Run Maya, and go to Window -> Settings/Preferences -> Plug-in Manager
 5. You should see radPickWalk.py. Click on "Loaded" and "Auto-Load"
 
