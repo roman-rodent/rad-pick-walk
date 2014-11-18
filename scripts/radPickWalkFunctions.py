@@ -403,6 +403,7 @@ def rad_save_associations():
         f.write(saveInfo)
 
 def rad_load_associations():
+    someFailures = False
     targetFile = ""
     files = cmds.fileDialog2(dialogStyle=2, fileFilter="*.radpw", fileMode=1, caption="Load Pickwalk Configuration", okCaption="Load")
     if files:
@@ -423,10 +424,15 @@ def rad_load_associations():
                         dirNode = infoArray[infoIndex]
                         infoIndex += 1
                         if dirNode != "null":
-                            if not pm.attributeQuery(dir_to_attr(direction), node=nodeName, exists=True):
-                                pm.addAttr(nodeName, longName=dir_to_attr(direction), attributeType="message")
-                            make_pick_walk(nodeName, dirNode, direction)
-
+                            try:
+                                if not pm.attributeQuery(dir_to_attr(direction), node=nodeName, exists=True):
+                                    pm.addAttr(nodeName, longName=dir_to_attr(direction), attributeType="message")
+                                make_pick_walk(nodeName, dirNode, direction)
+                            except:
+                                print "Error during load of " + nodeName + " -> " + direction + " -> " + dirNode
+                                someFailures = True
+    if someFailures:
+        pm.warning("Some relationships failed to load (possibly due to different set of nodes)")
 
 
 class RadLoadAssociationsCommand(OpenMayaMPx.MPxCommand):
