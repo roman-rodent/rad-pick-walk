@@ -82,10 +82,10 @@ def register_cmds(mobject):
 
 # Initialize the script plug-in
 def initializePlugin(mobject):
-	setup_shelf()
-	global OnExitCallback
-	OnExitCallback = OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kMayaExiting, teardown_shelf)
-	register_cmds(mobject)
+    setup_shelf()
+    global OnExitCallback
+    OnExitCallback = OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kMayaExiting, teardown_shelf)
+    register_cmds(mobject)
 
 
 # Uninitialize the script plug-in

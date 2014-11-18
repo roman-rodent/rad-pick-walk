@@ -15,316 +15,431 @@ RIGHT_BUTTON = "rad_rightButton"
 UP_BUTTON = "rad_upButton"
 DOWN_BUTTON = "rad_downButton"
 CENTRE_BUTTON = "rad_centreButton"
+SAVE_BUTTON = "rad_saveButton"
+LOAD_BUTTON = "rad_loadButton"
 BUTTON_NAMES = [LEFT_BUTTON, RIGHT_BUTTON, UP_BUTTON, DOWN_BUTTON, CENTRE_BUTTON]
+
+# If you change order here, all previously saved files affected!
+DIRECTIONS = ["up", "down", "left", "right"]
 
 OnExitCallback = None
 
 rad_pick_walk_mode = CREATE_MODE_NAME
 
-class RadPickWalkUpCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+class RadSaveAssociationsCommand(OpenMayaMPx.MPxCommand):
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("up", False)
+    def doIt(self, argList):
+        rad_save_associations()
+
+class RadLoadAssociationsCommand(OpenMayaMPx.MPxCommand):
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
+
+    def doIt(self, argList):
+        rad_load_associations()
+
+class RadPickWalkUpCommand(OpenMayaMPx.MPxCommand):
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
+
+    def doIt(self, argList):
+        rad_pick_walk("up", False)
 
 class RadPickWalkDownCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("down", False)
+    def doIt(self, argList):
+        rad_pick_walk("down", False)
 
 class RadPickWalkLeftCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("left", False)
+    def doIt(self, argList):
+        rad_pick_walk("left", False)
 
 class RadPickWalkRightCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("right", False)
+    def doIt(self, argList):
+        rad_pick_walk("right", False)
 
 class RadPickWalkAddUpCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("up", True)
+    def doIt(self, argList):
+        rad_pick_walk("up", True)
 
 class RadPickWalkAddDownCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("down", True)
+    def doIt(self, argList):
+        rad_pick_walk("down", True)
 
 class RadPickWalkAddLeftCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("left", True)
+    def doIt(self, argList):
+        rad_pick_walk("left", True)
 
 class RadPickWalkAddRightCommand(OpenMayaMPx.MPxCommand):
-	def __init__(self):
-		OpenMayaMPx.MPxCommand.__init__(self)
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
 
-	def doIt(self, argList):
-		rad_pick_walk("right", True)
+    def doIt(self, argList):
+        rad_pick_walk("right", True)
 
 def check_valid_dir(direction):
-	if direction not in ["up", "down", "left", "right"]:
-		raise NameError("Invalid direction: " + direction)
+    if direction not in ["up", "down", "left", "right"]:
+        raise NameError("Invalid direction: " + direction)
 
 def check_valid_obj(obj):
-	if not pm.objExists(obj):
-		raise NameError("Invalid object: " + obj)
+    if not pm.objExists(obj):
+        raise NameError("Invalid object: " + obj)
 
 def dir_to_attr(direction):
-	return "rad_" + direction
+    return "rad_" + direction
 
 def mark_scene_dirty():
-	mel.eval("file -modified 1")
+    mel.eval("file -modified 1")
 
 def make_pick_walk(source, destination, direction):
-	check_valid_dir(direction)
-	check_valid_obj(source)
-	check_valid_obj(destination)
+    check_valid_dir(direction)
+    check_valid_obj(source)
+    check_valid_obj(destination)
 
-	print "Adding pick walk from " + source + " to " + destination + " with direction " + direction
+    print "Adding pick walk from " + source + " to " + destination + " with direction " + direction
 
-	attr_name = dir_to_attr(direction)
-	if not pm.attributeQuery(attr_name, node=source, exists=True):
-		pm.addAttr(source, attributeType="message", longName=attr_name)
+    attr_name = dir_to_attr(direction)
+    if not pm.attributeQuery(attr_name, node=source, exists=True):
+        pm.addAttr(source, attributeType="message", longName=attr_name)
 
-	pm.connectAttr(destination + ".message", source + "." + attr_name, force=True)
-	mark_scene_dirty()
+    pm.connectAttr(destination + ".message", source + "." + attr_name, force=True)
+    mark_scene_dirty()
 
 def break_pick_walk(source, destination, direction):
-	pm.disconnectAttr(destination + ".message", source + "." + dir_to_attr(direction))
-	mark_scene_dirty()
+    pm.disconnectAttr(destination + ".message", source + "." + dir_to_attr(direction))
+    mark_scene_dirty()
 
 def find_connected_object(source, direction):
-	if pm.attributeQuery(dir_to_attr(direction), node=source, exists=True):
-		connections = pm.listConnections(source + "." + dir_to_attr(direction))
-		if connections:
-			return connections[0]
-	return ""
+    if pm.attributeQuery(dir_to_attr(direction), node=source, exists=True):
+        connections = pm.listConnections(source + "." + dir_to_attr(direction))
+        if connections:
+            return connections[0]
+    return ""
 
 def rad_pick_walk(direction, add):
-	check_valid_dir(direction)
+    check_valid_dir(direction)
 
-	selectedObjs = pm.ls(selection=True)
-	if not selectedObjs:
-		return
+    selectedObjs = pm.ls(selection=True)
+    if not selectedObjs:
+        return
 
-	newSelectedObjs = []
-	for obj in selectedObjs:
-		if add and obj not in newSelectedObjs:
-			newSelectedObjs.append(obj)
-	connection = find_connected_object(selectedObjs[len(selectedObjs) - 1], direction)
-	if connection:
-		# If going back to previous node, handle it as "unselect"
-		if len(newSelectedObjs) > 1 and newSelectedObjs[len(newSelectedObjs) - 2] == connection:
-			newSelectedObjs.pop(len(newSelectedObjs) - 1)
-		else:
-			# Connection should be at the end of the list, since that
-			# will be the selected node
-			try:
-				newSelectedObjs.remove(connection)
-			except:
-				pass
-			newSelectedObjs.append(connection)
-	if newSelectedObjs:
-		pm.select(newSelectedObjs, replace=True)
+    newSelectedObjs = []
+    for obj in selectedObjs:
+        if add and obj not in newSelectedObjs:
+            newSelectedObjs.append(obj)
+    connection = find_connected_object(selectedObjs[len(selectedObjs) - 1], direction)
+    if connection:
+        # If going back to previous node, handle it as "unselect"
+        if len(newSelectedObjs) > 1 and newSelectedObjs[len(newSelectedObjs) - 2] == connection:
+            newSelectedObjs.pop(len(newSelectedObjs) - 1)
+        else:
+            # Connection should be at the end of the list, since that
+            # will be the selected node
+            try:
+                newSelectedObjs.remove(connection)
+            except:
+                pass
+            newSelectedObjs.append(connection)
+    if newSelectedObjs:
+        pm.select(newSelectedObjs, replace=True)
 
 def set_pick_walk_create():
-	global rad_pick_walk_mode
-	rad_pick_walk_mode = CREATE_MODE_NAME
+    global rad_pick_walk_mode
+    rad_pick_walk_mode = CREATE_MODE_NAME
 
 def set_pick_walk_navigate():
-	global rad_pick_walk_mode
-	rad_pick_walk_mode = NAV_MODE_NAME
+    global rad_pick_walk_mode
+    rad_pick_walk_mode = NAV_MODE_NAME
 
 def make_pick_walk_button_click(name):
-	button = main_buttons[name]
-	if not button:
-		raise NameError("Invalid button: " + name)
-	direction = ""
-	if name == UP_BUTTON:
-		direction = "up"
-	elif name == DOWN_BUTTON:
-		direction = "down"
-	elif name == LEFT_BUTTON:
-		direction = "left"
-	elif name == RIGHT_BUTTON:
-		direction = "right"
-	else:
-		raise NameError("Invalid button: " + name)
+    button = main_buttons[name]
+    if not button:
+        raise NameError("Invalid button: " + name)
+    direction = ""
+    if name == UP_BUTTON:
+        direction = "up"
+    elif name == DOWN_BUTTON:
+        direction = "down"
+    elif name == LEFT_BUTTON:
+        direction = "left"
+    elif name == RIGHT_BUTTON:
+        direction = "right"
+    else:
+        raise NameError("Invalid button: " + name)
 
-	attr_name = dir_to_attr(direction)
+    attr_name = dir_to_attr(direction)
 
-	centre_obj = main_buttons[CENTRE_BUTTON]
-	centre_obj_name = centre_obj.getLabel()
-	print centre_obj_name
-	print rad_pick_walk_mode
-	if pm.objExists(centre_obj_name):
-		if rad_pick_walk_mode == CREATE_MODE_NAME:
-			selection = pm.ls(selection=True)
-			if selection:
-				if not pm.attributeQuery(attr_name, node=centre_obj_name, exists=True):
-					pm.addAttr(centre_obj_name, longName=attr_name, attributeType="message")
+    centre_obj = main_buttons[CENTRE_BUTTON]
+    centre_obj_name = centre_obj.getLabel()
+    print centre_obj_name
+    print rad_pick_walk_mode
+    if pm.objExists(centre_obj_name):
+        if rad_pick_walk_mode == CREATE_MODE_NAME:
+            selection = pm.ls(selection=True)
+            if selection:
+                if not pm.attributeQuery(attr_name, node=centre_obj_name, exists=True):
+                    pm.addAttr(centre_obj_name, longName=attr_name, attributeType="message")
 
-				if centre_obj_name == selection[0]:
-					pm.confirmDialog(message="Can't pickwalk to itself, silly...")
-					pm.error("Can't pickwalk to self, silly...")
-				else:
-					make_pick_walk(centre_obj_name, selection[0], direction)
-			else:
-				label = button.getLabel()
-				if label != "blank":
-					result = pm.confirmDialog(message="You have nothing selected. Do you want to clear the " + direction + " direction for " + centre_obj_name + "?", button=["Yes", "No"], cancelButton="No")
-					if result == "Yes":
-						connections = pm.listConnections(centre_obj_name + "." + attr_name)
-						if connections:
-							break_pick_walk(centre_obj_name, connections[0], direction)
+                if centre_obj_name == selection[0]:
+                    pm.confirmDialog(message="Can't pickwalk to itself, silly...")
+                    pm.error("Can't pickwalk to self, silly...")
+                else:
+                    make_pick_walk(centre_obj_name, selection[0], direction)
+            else:
+                label = button.getLabel()
+                if label != "blank":
+                    result = pm.confirmDialog(message="You have nothing selected. Do you want to clear the " + direction + " direction for " + centre_obj_name + "?", button=["Yes", "No"], cancelButton="No")
+                    if result == "Yes":
+                        connections = pm.listConnections(centre_obj_name + "." + attr_name)
+                        if connections:
+                            break_pick_walk(centre_obj_name, connections[0], direction)
 
-		elif rad_pick_walk_mode == NAV_MODE_NAME:
-			rad_pick_walk(direction, False)
-			add_selected_obj_to_middle()
+        elif rad_pick_walk_mode == NAV_MODE_NAME:
+            rad_pick_walk(direction, False)
+            add_selected_obj_to_middle()
 
-	update_pick_walk_window()
+    update_pick_walk_window()
 
 
 def build_make_pick_walk_window(window_name):
-	pm.window(window_name, title="Make Pick Walk")
-	pm.columnLayout(adjustableColumn=True)
-	form_layout = pm.formLayout(numberOfDivisions=100)
-	topLeftBlank = pm.text("rad_topLeftBlank", label="")
-	upButton = pm.button(UP_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(UP_BUTTON))
-	topRightBlank = pm.text("rad_topRightBlank", label="")
+    pm.window(window_name, title="Make Pick Walk")
+    pm.columnLayout(adjustableColumn=True)
+    form_layout = pm.formLayout(numberOfDivisions=100)
+    topLeftBlank = pm.text("rad_topLeftBlank", label="")
+    upButton = pm.button(UP_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(UP_BUTTON))
+    topRightBlank = pm.text("rad_topRightBlank", label="")
 
-	leftButton = pm.button(LEFT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(LEFT_BUTTON))
-	centreButton = pm.button(CENTRE_BUTTON, label="nothing selected", command= lambda *args: add_selected_obj_to_middle())
-	rightButton = pm.button(RIGHT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(RIGHT_BUTTON))
+    leftButton = pm.button(LEFT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(LEFT_BUTTON))
+    centreButton = pm.button(CENTRE_BUTTON, label="nothing selected", command= lambda *args: add_selected_obj_to_middle())
+    rightButton = pm.button(RIGHT_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(RIGHT_BUTTON))
 
-	botLeftBlank = pm.text("rad_botLeftBlank", label="")
-	downButton = pm.button(DOWN_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(DOWN_BUTTON))
-	botRightBlank = pm.text("rad_botRightBlank", label="")
+    botLeftBlank = pm.text("rad_botLeftBlank", label="")
+    downButton = pm.button(DOWN_BUTTON, label="blank", command= lambda *args: make_pick_walk_button_click(DOWN_BUTTON))
+    botRightBlank = pm.text("rad_botRightBlank", label="")
 
-	main_buttons[UP_BUTTON] = upButton
-	main_buttons[LEFT_BUTTON] = leftButton
-	main_buttons[CENTRE_BUTTON] = centreButton
-	main_buttons[RIGHT_BUTTON] = rightButton
-	main_buttons[DOWN_BUTTON] = downButton
+    blankBeforeSave1 = pm.text("rad_blankBetweenSave1", label="")
+    blankBeforeSave2 = pm.text("rad_blankBetweenSave2", label="")
+    blankBeforeSave3 = pm.text("rad_blankBetweenSave3", label="")
+    saveButton = pm.button(SAVE_BUTTON, label="SAVE", command= lambda *args: rad_save_associations())
+    loadButton = pm.button(LOAD_BUTTON, label="LOAD", command= lambda *args: rad_load_associations())
+
+    main_buttons[UP_BUTTON] = upButton
+    main_buttons[LEFT_BUTTON] = leftButton
+    main_buttons[CENTRE_BUTTON] = centreButton
+    main_buttons[RIGHT_BUTTON] = rightButton
+    main_buttons[DOWN_BUTTON] = downButton
 
 
-	mode = pm.radioButtonGrp(columnWidth=[[1,100]], columnAlign=[[1,"left"]], label="CURRENT MODE: ", label1="Creation", label2="Navigation", select=1, numberOfRadioButtons=2, onCommand1= lambda *args: set_pick_walk_create(), onCommand2= lambda *args: set_pick_walk_navigate())
-	form_layout.attachForm(mode, "top", 5)
-	form_layout.attachForm(mode, "left", 5)
-	form_layout.attachForm(mode, "right", 5)
+    mode = pm.radioButtonGrp(columnWidth=[[1,100]], columnAlign=[[1,"left"]], label="CURRENT MODE: ", label1="Creation", label2="Navigation", select=1, numberOfRadioButtons=2, onCommand1= lambda *args: set_pick_walk_create(), onCommand2= lambda *args: set_pick_walk_navigate())
+    form_layout.attachForm(mode, "top", 5)
+    form_layout.attachForm(mode, "left", 5)
+    form_layout.attachForm(mode, "right", 5)
 
-	form_layout.attachControl(topLeftBlank, "top", 10, mode)
-	form_layout.attachForm(topLeftBlank, "left", 0)
-	form_layout.attachPosition(topLeftBlank, "right", 0, 33)
+    form_layout.attachControl(topLeftBlank, "top", 10, mode)
+    form_layout.attachForm(topLeftBlank, "left", 0)
+    form_layout.attachPosition(topLeftBlank, "right", 0, 33)
 
-	form_layout.attachControl(upButton, "top", 10, mode)
-	form_layout.attachPosition(upButton, "left", 0, 33)
-	form_layout.attachPosition(upButton, "right", 0, 66)
+    form_layout.attachControl(upButton, "top", 10, mode)
+    form_layout.attachPosition(upButton, "left", 0, 33)
+    form_layout.attachPosition(upButton, "right", 0, 66)
 
-	form_layout.attachControl(topRightBlank, "top", 10, mode)
-	form_layout.attachPosition(topRightBlank, "left", 0, 66)
-	form_layout.attachForm(topRightBlank, "right", 0)
+    form_layout.attachControl(topRightBlank, "top", 10, mode)
+    form_layout.attachPosition(topRightBlank, "left", 0, 66)
+    form_layout.attachForm(topRightBlank, "right", 0)
 
-	form_layout.attachControl(leftButton, "top", 5, upButton)
-	form_layout.attachForm(leftButton, "left", 0)
-	form_layout.attachPosition(leftButton, "right", 0, 33)
+    form_layout.attachControl(leftButton, "top", 5, upButton)
+    form_layout.attachForm(leftButton, "left", 0)
+    form_layout.attachPosition(leftButton, "right", 0, 33)
 
-	form_layout.attachControl(centreButton, "top", 5, upButton)
-	form_layout.attachPosition(centreButton, "left", 0, 33)
-	form_layout.attachPosition(centreButton, "right", 0, 66)
+    form_layout.attachControl(centreButton, "top", 5, upButton)
+    form_layout.attachPosition(centreButton, "left", 0, 33)
+    form_layout.attachPosition(centreButton, "right", 0, 66)
 
-	form_layout.attachControl(rightButton, "top", 5, upButton)
-	form_layout.attachPosition(rightButton, "left", 0, 66)
-	form_layout.attachForm(rightButton, "right", 0)
+    form_layout.attachControl(rightButton, "top", 5, upButton)
+    form_layout.attachPosition(rightButton, "left", 0, 66)
+    form_layout.attachForm(rightButton, "right", 0)
 
-	form_layout.attachControl(botLeftBlank, "top", 5, leftButton)
-	form_layout.attachForm(botLeftBlank, "left", 0)
-	form_layout.attachPosition(botLeftBlank, "right", 0, 33)
+    form_layout.attachControl(botLeftBlank, "top", 5, leftButton)
+    form_layout.attachForm(botLeftBlank, "left", 0)
+    form_layout.attachPosition(botLeftBlank, "right", 0, 33)
 
-	form_layout.attachControl(downButton, "top", 5, leftButton)
-	form_layout.attachPosition(downButton, "left", 0, 33)
-	form_layout.attachPosition(downButton, "right", 0, 66)
+    form_layout.attachControl(downButton, "top", 5, leftButton)
+    form_layout.attachPosition(downButton, "left", 0, 33)
+    form_layout.attachPosition(downButton, "right", 0, 66)
 
-	form_layout.attachControl(botRightBlank, "top", 5, leftButton)
-	form_layout.attachPosition(botRightBlank, "left", 0, 66)
-	form_layout.attachForm(botRightBlank, "right", 0)
+    form_layout.attachControl(botRightBlank, "top", 5, leftButton)
+    form_layout.attachPosition(botRightBlank, "left", 0, 66)
+    form_layout.attachForm(botRightBlank, "right", 0)
+
+    form_layout.attachControl(blankBeforeSave1, "top", 5, downButton)
+    form_layout.attachForm(blankBeforeSave1, "left", 0)
+    form_layout.attachPosition(blankBeforeSave1, "right", 0, 33)
+
+    form_layout.attachControl(blankBeforeSave2, "top", 5, downButton)
+    form_layout.attachPosition(blankBeforeSave2, "left", 0, 33)
+    form_layout.attachPosition(blankBeforeSave2, "right", 0, 66)
+
+    form_layout.attachControl(blankBeforeSave3, "top", 5, downButton)
+    form_layout.attachPosition(blankBeforeSave3, "left", 0, 66)
+    form_layout.attachForm(blankBeforeSave3, "right", 0)
+
+    form_layout.attachControl(saveButton, "top", 5, blankBeforeSave1)
+    form_layout.attachForm(saveButton, "left", 0)
+    form_layout.attachPosition(saveButton, "right", 0, 33)
+
+    form_layout.attachControl(loadButton, "top", 5, blankBeforeSave1)
+    form_layout.attachPosition(loadButton, "left", 0, 33)
+    form_layout.attachPosition(loadButton, "right", 0, 66)
+
+
 
 def reset_pick_walk_buttons():
-	for button_name in BUTTON_NAMES:
-		button = main_buttons[button_name]
-		if button:
-			if button_name == CENTRE_BUTTON:
-				button.setLabel("nothing selected")
-			else:
-				button.setLabel("blank")
+    for button_name in BUTTON_NAMES:
+        button = main_buttons[button_name]
+        if button:
+            if button_name == CENTRE_BUTTON:
+                button.setLabel("nothing selected")
+            else:
+                button.setLabel("blank")
 
 
 def update_pick_walk_window():
-	centre_obj = main_buttons[CENTRE_BUTTON]
-	centre_obj_name = centre_obj.getLabel()
-	if not pm.objExists(centre_obj_name):
-		reset_pick_walk_buttons()
-	else:
-		up = find_connected_object(centre_obj_name, "up")
-		down = find_connected_object(centre_obj_name, "down")
-		left = find_connected_object(centre_obj_name, "left")
-		right = find_connected_object(centre_obj_name, "right")
+    centre_obj = main_buttons[CENTRE_BUTTON]
+    centre_obj_name = centre_obj.getLabel()
+    if not pm.objExists(centre_obj_name):
+        reset_pick_walk_buttons()
+    else:
+        up = find_connected_object(centre_obj_name, "up")
+        down = find_connected_object(centre_obj_name, "down")
+        left = find_connected_object(centre_obj_name, "left")
+        right = find_connected_object(centre_obj_name, "right")
 
-		if not up:
-			up = "blank"
-		if not down:
-			down = "blank"
-		if not left:
-			left = "blank"
-		if not right:
-			right = "blank"
-		main_buttons[UP_BUTTON].setLabel(up)
-		main_buttons[DOWN_BUTTON].setLabel(down)
-		main_buttons[LEFT_BUTTON].setLabel(left)
-		main_buttons[RIGHT_BUTTON].setLabel(right)
+        if not up:
+            up = "blank"
+        if not down:
+            down = "blank"
+        if not left:
+            left = "blank"
+        if not right:
+            right = "blank"
+        main_buttons[UP_BUTTON].setLabel(up)
+        main_buttons[DOWN_BUTTON].setLabel(down)
+        main_buttons[LEFT_BUTTON].setLabel(left)
+        main_buttons[RIGHT_BUTTON].setLabel(right)
 
 
 def make_pick_walk_from_sel(direction):
-	check_valid_dir(direction)
-	selection = pm.ls(selection=True)
-	if len(selection) != 2:
-		pm.error("You need to select 2 objects to make pick walk from selection")
+    check_valid_dir(direction)
+    selection = pm.ls(selection=True)
+    if len(selection) != 2:
+        pm.error("You need to select 2 objects to make pick walk from selection")
 
-	destination = selection[0]
-	source = selection[1]
+    destination = selection[0]
+    source = selection[1]
 
-	make_pick_walk(source, destination, direction)
+    make_pick_walk(source, destination, direction)
 
 def add_selected_obj_to_middle():
-	selectedObjs = pm.ls(selection=True)
-	if selectedObjs:
-		dabutton = main_buttons[CENTRE_BUTTON]
-		dabutton.setLabel(selectedObjs[0])
-	update_pick_walk_window()
+    selectedObjs = pm.ls(selection=True)
+    if selectedObjs:
+        dabutton = main_buttons[CENTRE_BUTTON]
+        dabutton.setLabel(selectedObjs[0])
+    update_pick_walk_window()
 
 def destroy_pick_walk_ui():
-	if pm.window(UI_WINDOW_NAME, exists=True):
-		pm.deleteUI(UI_WINDOW_NAME)
+    if pm.window(UI_WINDOW_NAME, exists=True):
+        pm.deleteUI(UI_WINDOW_NAME)
+
+def rad_save_associations():
+    targetFile = ""
+    files = cmds.fileDialog2(dialogStyle=2, fileFilter="*.radpw", fileMode=0)
+    if files:
+        if len(files) > 0:
+            targetFile = files[0]
+    if not targetFile:
+        return
+
+    saveInfo = "This is the order:"
+    for direction in DIRECTIONS:
+        saveInfo += " "
+        saveInfo += direction
+    saveInfo += '\n'
+    allNodes = cmds.ls(recursive=True)
+    for nodeName in allNodes:
+        if pm.objExists(nodeName):
+            nodeEntry = nodeName
+            relevantNode = False
+            for direction in DIRECTIONS:
+                nodeEntry += " "
+                if pm.attributeQuery(dir_to_attr(direction), node=nodeName, exists=True):
+                    relevantNode = True
+                    nodeEntry += pm.getAttr(nodeName + "." + dir_to_attr(direction))
+                else:
+                    nodeEntry += "null"
+
+            if relevantNode:
+                saveInfo += nodeEntry
+                saveInfo += '\n'
+    with open(targetFile, "w") as f:
+        f.write(saveInfo)
+
+def rad_load_associations():
+    targetFile = ""
+    files = cmds.fileDialog2(dialogStyle=2, fileFilter="*.radpw", fileMode=1, caption="Load Pickwalk Configuration", okCaption="Load")
+    if files:
+        if len(files) > 0:
+            targetFile = files[0]
+    if not targetFile:
+        return
+    allNodes = cmds.ls(recursive=True)
+    with open(targetFile) as f:
+        for line in f:
+            if not line.startswith("This"):
+                infoArray = line.split()
+                # node-name dir dir dir dir
+                nodeName = infoArray[0]
+                if pm.objExists(nodeName):
+                    infoIndex = 1
+                    for direction in DIRECTIONS:
+                        dirNode = infoArray[infoIndex]
+                        infoIndex += 1
+                        if dirNode != "null":
+                            if not pm.attributeQuery(dir_to_attr(direction), node=nodeName, exists=True):
+                                pm.addAttr(nodeName, longName=dir_to_attr(direction), attributeType="message")
+                            make_pick_walk(nodeName, dirNode, direction)
+
+
+
+class RadLoadAssociationsCommand(OpenMayaMPx.MPxCommand):
+    def __init__(self):
+        OpenMayaMPx.MPxCommand.__init__(self)
+
+    def doIt(self, argList):
+        rad_load_associations()
 
 def make_pick_walk_ui():
-	destroy_pick_walk_ui()
-	build_make_pick_walk_window(UI_WINDOW_NAME)
-	pm.showWindow(UI_WINDOW_NAME)
-	print main_buttons
-	add_selected_obj_to_middle()
+    destroy_pick_walk_ui()
+    build_make_pick_walk_window(UI_WINDOW_NAME)
+    pm.showWindow(UI_WINDOW_NAME)
+    print main_buttons
+    add_selected_obj_to_middle()
+
