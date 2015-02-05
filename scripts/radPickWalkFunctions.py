@@ -391,8 +391,13 @@ def rad_save_associations():
             for direction in DIRECTIONS:
                 nodeEntry += " "
                 if pm.attributeQuery(dir_to_attr(direction), node=nodeName, exists=True):
-                    relevantNode = True
-                    nodeEntry += pm.getAttr(nodeName + "." + dir_to_attr(direction))
+                    connection = pm.getAttr(nodeName + "." + dir_to_attr(direction))
+                    if connection:
+                        relevantNode = True
+                        nodeEntry += connection
+                    else:
+                        # The attribute existed but had a null value, so no connection!
+                        nodeEntry += "null"
                 else:
                     nodeEntry += "null"
 
